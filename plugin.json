@@ -1,0 +1,18 @@
+{
+  "id": "acode.plugin.workspace",
+  "name": "Workspace Manager",
+  "main": "dist/main.js",
+  "version": "1.0.1",
+  "readme": "readme.md",
+  "icon": "icon.png",
+  "files": [
+    
+  ],
+  "minVersionCode" : 290,
+  "price": 0,
+  "author": {
+    "name": "",
+    "email": "",
+    "github": ""
+  }
+}
