@@ -37,14 +37,12 @@
       
       #spaces-list .space-item {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: center;
       }
       
       #spaces-list .space-item .space-name {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
+        
       }
       
       .recent-spaces {
@@ -63,17 +61,17 @@
       );
 
       document.head.appendChild(style);
-      sidebarApps.add("folder", plugin.id, "Workspace Manager", (container) => {
+      sidebarApps.add("folder2", plugin.id, "Workspace Manager", (container) => {
         this.node = tag("div", {
           id: "spaceManager",
           children: [
             tag("button", {
               textContent: "Load Workspace",
-              onclick: this.loadSpace.bind(this),
+              onclick: () => this.loadSpace(),
             }),
             tag("button", {
               textContent: "Save Workspace",
-              onclick: this.saveSpace.bind(this),
+              onclick: () => this.saveSpace(),
             }),
           ],
         });
@@ -100,7 +98,7 @@
       this.$func = this.loadModeSpace.bind(this);
 
       editorManager.on("switch-file", this.$func);
-      this.$func();
+      // this.$func();
 
       this.buildSpaceList();
     }
@@ -137,11 +135,11 @@
         this.recentspaces.push(spaceUrl);
       }
       localStorage.setItem("acw:recent", JSON.stringify(this.recentspaces));
+      this.buildSpaceList();
 
       loading.destroy();
       toast("Saved workspace.");
 
-      this.buildSpaceList();
     }
 
     async loadSpace(spaceUrl) {
@@ -207,7 +205,13 @@
       );
 
       loading.setMessage("Updating Settings");
-      appSettings.update(settings);
+      appSettings.update(settings, false, false);
+      
+      if (!this.recentspaces.includes(spaceUrl)) {
+        this.recentspaces.push(spaceUrl);
+      }
+      localStorage.setItem("acw:recent", JSON.stringify(this.recentspaces));
+      this.buildSpaceList();
 
       loading.destroy();
       toast("Loaded workspace.");
@@ -224,9 +228,10 @@
           this.revertSetting = this.revert(modeSettings, appSettings.value);
         }
         // console.log(this.revertSetting);
-        appSettings.update(modeSettings);
+        appSettings.update(modeSettings, false, false);
       } else {
-        this.revertSetting && appSettings.update(this.revertSetting);
+        this.revertSetting &&
+          appSettings.update(this.revertSetting, false, false);
         this.revertSetting = null;
       }
     }
@@ -262,10 +267,10 @@
                 ],
                 onclick: async () => {
                   let action = await acode.select("Select Action", [
-                    ["load", "Load Space"],
-                    ["save", "Save Space"],
-                    ["remove", "Remove Space"],
-                    ["delete", "Delete Space"],
+                    ["load", "Load Space", "file_upload"],
+                    ["save", "Save Space", "save"],
+                    ["remove", "Remove Space", "edit"],
+                    ["delete", "Delete Space", "delete"],
                   ]);
                   switch (action) {
                     case "load":
@@ -287,6 +292,7 @@
                         "acw:recent",
                         JSON.stringify(this.recentspaces)
                       );
+                      this.buildSpaceList()
                   }
                 },
               }),
